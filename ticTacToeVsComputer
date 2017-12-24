@@ -1,0 +1,847 @@
+//Tic Tac Toe - Player vs. Computer (easy)
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Random;
+
+public class TicTacToeVsComp extends JFrame {
+
+	JPanel grid = new JPanel();
+	JPanel options = new JPanel();
+	JPanel ending = new JPanel();
+	char[][] gamePlay = new char[3][3];
+	int turn = 1;
+	int p1score=0;
+	int p2score=0;
+	int winner = 0;
+	JButton topLeft;
+	JButton topMiddle;
+	JButton topRight;
+	JButton middleLeft;
+	JButton middleMiddle;
+	JButton middleRight;
+	JButton bottomLeft;
+	JButton bottomMiddle;
+	JButton bottomRight;
+	JLabel p1scorelabel;
+	JLabel p2scorelabel;
+	JLabel pturn;
+	JButton close;
+	JButton restart;
+	final int WIDTH = 500;
+	final int HEIGHT = 275;
+	Random rand = new Random();
+
+
+
+	public TicTacToeVsComp() {
+		setTitle("Tic-Tac-Toe by Christopher Shepherd");
+		setSize(WIDTH, HEIGHT);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLayout(new BorderLayout());
+
+		JLabel welcome = new JLabel("<html>Welcome to Chris's Tic-Tac-Toe game! <br> Player 1 (X), please click a box to make a move.. <br> The computer (O) will go directly afterwards. Enjoy! <html>", SwingConstants.CENTER);
+
+		add(welcome, BorderLayout.NORTH);
+
+		buildGridWest();
+		buildOptionsCenter();
+		buildEndingSouth();
+		add(grid, BorderLayout.WEST);
+		add(options, BorderLayout.CENTER);
+		add(ending, BorderLayout.SOUTH);
+
+		setVisible(true);
+	}
+
+	public void buildGridWest() {
+		grid.setLayout(new GridLayout(3,3));
+
+		Font m = new Font("SansSerif",Font.BOLD,35);
+
+		topLeft = new JButton("-");
+		topLeft.setFont(m);
+		topLeft.addActionListener(new buttonListeners() );
+		topLeft.setActionCommand("a");
+
+		topMiddle = new JButton("-");
+		topMiddle.setFont(m);
+		topMiddle.addActionListener(new buttonListeners() );
+		topMiddle.setActionCommand("b");
+
+		topRight = new JButton("-");
+		topRight.setFont(m);
+		topRight.addActionListener(new buttonListeners() );
+		topRight.setActionCommand("c");
+
+		middleLeft = new JButton("-");
+		middleLeft.setFont(m);
+		middleLeft.addActionListener(new buttonListeners() );
+		middleLeft.setActionCommand("d");
+
+		middleMiddle = new JButton("-");
+		middleMiddle.setFont(m);
+		middleMiddle.addActionListener(new buttonListeners() );
+		middleMiddle.setActionCommand("e");
+
+		middleRight = new JButton("-");
+		middleRight.setFont(m);
+		middleRight.addActionListener(new buttonListeners() );
+		middleRight.setActionCommand("f");
+
+		bottomLeft = new JButton("-");
+		bottomLeft.setFont(m);
+		bottomLeft.addActionListener(new buttonListeners() );
+		bottomLeft.setActionCommand("g");
+
+		bottomMiddle = new JButton("-");
+		bottomMiddle.setFont(m);
+		bottomMiddle.addActionListener(new buttonListeners() );
+		bottomMiddle.setActionCommand("h");
+
+		bottomRight = new JButton("-");
+		bottomRight.setFont(m);
+		bottomRight.addActionListener(new buttonListeners() );
+		bottomRight.setActionCommand("i");
+
+		grid.add(topLeft);
+		grid.add(topMiddle);
+		grid.add(topRight);
+		grid.add(middleLeft);
+		grid.add(middleMiddle);
+		grid.add(middleRight);
+		grid.add(bottomLeft);
+		grid.add(bottomMiddle);
+		grid.add(bottomRight);
+
+		grid.setBorder(BorderFactory.createTitledBorder("Game"));
+
+	}
+
+	public void buildOptionsCenter() {
+		options.setLayout(new BoxLayout(options, BoxLayout.PAGE_AXIS));
+
+		Font c = new Font("SansSerif",Font.BOLD,13);
+
+		JLabel p1 = new JLabel("Player 1:");
+		p1.setFont(c);
+		p1scorelabel = new JLabel("Score: "+p1score);
+		JLabel p2 = new JLabel("Player 2: ");
+		p2.setFont(c);
+		p2scorelabel = new JLabel("Score: "+p2score);
+		pturn = new JLabel("Current Turn: Player 1");
+		pturn.setFont(c);
+
+		options.add(Box.createRigidArea(new Dimension(5,3)));
+		options.add(p1);
+		options.add(p1scorelabel);
+		options.add(Box.createRigidArea(new Dimension(5,15)));
+		options.add(p2);
+		options.add(p2scorelabel);
+		options.add(Box.createRigidArea(new Dimension(5,25)));
+		options.add(pturn);
+
+		options.setBorder(BorderFactory.createTitledBorder("Options"));
+
+	}
+
+	public void buildEndingSouth() {
+		ending.setLayout(new GridLayout(1,2));
+
+		close = new JButton("Exit");
+		close.addActionListener(new buttonListeners() );
+		restart = new JButton("Restart Game");
+		restart.addActionListener(new buttonListeners() );
+
+		ending.add(restart);
+		ending.add(close);
+	}
+
+	private class buttonListeners implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource()==topLeft) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && topLeft.getText()=="-") {
+					topLeft.setText("X");
+					gamePlay[0][0] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && topLeft.getText()=="-") {
+					topLeft.setText("O");
+					gamePlay[0][0] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+
+			}
+			if (e.getSource()==topMiddle) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && topMiddle.getText()=="-") {
+					topMiddle.setText("X");
+					gamePlay[0][1] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && topMiddle.getText()=="-") {
+					topMiddle.setText("O");
+					gamePlay[0][1] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==topRight) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && topRight.getText()=="-") {
+					topRight.setText("X");
+					gamePlay[0][2] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && topRight.getText()=="-") {
+					topRight.setText("O");
+					gamePlay[0][2] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==middleLeft) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && middleLeft.getText()=="-") {
+					middleLeft.setText("X");
+					gamePlay[1][0] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && middleLeft.getText()=="-") {
+					middleLeft.setText("O");
+					gamePlay[1][0] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==middleMiddle) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && middleMiddle.getText()=="-") {
+					middleMiddle.setText("X");
+					gamePlay[1][1] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && middleMiddle.getText()=="-") {
+					middleMiddle.setText("O");
+					gamePlay[1][1] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==middleRight) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && middleRight.getText()=="-") {
+					middleRight.setText("X");
+					gamePlay[1][2] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && middleRight.getText()=="-") {
+					middleRight.setText("O");
+					gamePlay[1][2] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==bottomLeft) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && bottomLeft.getText()=="-") {
+					bottomLeft.setText("X");
+					gamePlay[2][0] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && bottomLeft.getText()=="-") {
+					bottomLeft.setText("O");
+					gamePlay[2][0] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==bottomMiddle) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && bottomMiddle.getText()=="-") {
+					bottomMiddle.setText("X");
+					gamePlay[2][1] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && bottomMiddle.getText()=="-") {
+					bottomMiddle.setText("O");
+					gamePlay[2][1] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==bottomRight) {
+				if (turn==1)
+					reset();
+				if (turn%2 == 1 && bottomRight.getText()=="-") {
+					bottomRight.setText("X");
+					gamePlay[2][2] = 'X';
+					//pturn.setText("Current Turn: Player 2");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0) {
+						JOptionPane.showMessageDialog(null, "Draw!");
+						reset();
+					}
+					else {
+						if (isWinner()==0) {
+							computer();
+							if (isWinner() == 2){
+								p2score++;
+								p2scorelabel.setText("Score: "+p2score);
+								JOptionPane.showMessageDialog(null, "Computer is the winner!");
+								reset();
+							}
+							else
+								turn++;
+						}
+						else {
+							reset();
+						}
+					}
+				}
+				/*if (turn%2 == 0 && bottomRight.getText()=="-") {
+					bottomRight.setText("O");
+					gamePlay[2][2] = 'O';
+					pturn.setText("Current Turn: Player 1");
+					if (isWinner()>0) {
+						JOptionPane.showMessageDialog(null, "Player "+isWinner()+" is the winner!");
+						if (isWinner() == 1) {
+							p1score++;
+							p1scorelabel.setText("Score: "+p1score);
+						}
+						if (isWinner() == 2){
+							p2score++;
+							p2scorelabel.setText("Score: "+p2score);
+						}
+					}
+					if (turn==9 && isWinner()==0)
+						JOptionPane.showMessageDialog(null, "Draw!");
+					turn++;
+					computer();
+				}*/
+			}
+			if (e.getSource()==close) {
+				System.exit(0);
+			}
+			if (e.getSource()==restart) {
+				reset();
+			}
+
+		}
+	}
+
+	public int isWinner() {
+		//Player 1 check
+		if (gamePlay[0][0]=='X' && gamePlay[0][1]=='X' && gamePlay[0][2]=='X'){
+			winner = 1;
+			return winner;
+		}
+		if (gamePlay[1][0]=='X' && gamePlay[1][1]=='X' && gamePlay[1][2]=='X'){
+			winner = 1;
+			return winner;
+		}
+		if (gamePlay[2][0]=='X' && gamePlay[2][1]=='X' && gamePlay[2][2]=='X'){
+			winner = 1;
+			return winner;
+		}
+		if (gamePlay[0][0]=='X' && gamePlay[1][0]=='X' && gamePlay[2][0]=='X'){
+			winner = 1;
+			return winner;
+		}
+		if (gamePlay[0][1]=='X' && gamePlay[1][1]=='X' && gamePlay[2][1]=='X'){
+			winner = 1;
+			return winner;
+		}
+		if (gamePlay[0][2]=='X' && gamePlay[1][2]=='X' && gamePlay[2][2]=='X'){
+			winner = 1;
+			return winner;
+		}
+		if (gamePlay[0][0]=='X' && gamePlay[1][1]=='X' && gamePlay[2][2]=='X'){
+			winner = 1;
+			return winner;
+		}
+		if (gamePlay[0][2]=='X' && gamePlay[1][1]=='X' && gamePlay[2][0]=='X'){
+			winner = 1;
+			return winner;
+		}
+
+		//Player 2 Check
+		if (gamePlay[0][0]=='O' && gamePlay[0][1]=='O' && gamePlay[0][2]=='O'){
+			winner = 2;
+			return winner;
+		}
+		if (gamePlay[1][0]=='O' && gamePlay[1][1]=='O' && gamePlay[1][2]=='O'){
+			winner = 2;
+			return winner;
+		}
+		if (gamePlay[2][0]=='O' && gamePlay[2][1]=='O' && gamePlay[2][2]=='O'){
+			winner = 2;
+			return winner;
+		}
+		if (gamePlay[0][0]=='O' && gamePlay[1][0]=='O' && gamePlay[2][0]=='O'){
+			winner = 2;
+			return winner;
+		}
+		if (gamePlay[0][1]=='O' && gamePlay[1][1]=='O' && gamePlay[2][1]=='O'){
+			winner = 2;
+			return winner;
+		}
+		if (gamePlay[0][2]=='O' && gamePlay[1][2]=='O' && gamePlay[2][2]=='O'){
+			winner = 2;
+			return winner;
+		}
+		if (gamePlay[0][0]=='O' && gamePlay[1][1]=='O' && gamePlay[2][2]=='O'){
+			winner = 2;
+			return winner;
+		}
+		if (gamePlay[0][2]=='O' && gamePlay[1][1]=='O' && gamePlay[2][0]=='O'){
+			winner = 2;
+			return winner;
+		}
+		return winner;
+	}
+
+	public void computer() {
+		int keepGoing = 0;
+		while (keepGoing == 0) {
+			int x = rand.nextInt(3);
+			int y = rand.nextInt(3);
+			if (gamePlay[x][y] == '-') {
+				gamePlay[x][y] = 'O';
+				if (x==0 && y==0) {
+					topLeft.setText("O");
+				}
+				if (x==0 && y==1) {
+					topMiddle.setText("O");
+				}
+				if (x==0 && y==2) {
+					topRight.setText("O");
+				}
+				if (x==1 && y==0) {
+					middleLeft.setText("O");
+				}
+				if (x==1 && y==1) {
+					middleMiddle.setText("O");
+				}
+				if (x==1 && y==2) {
+					middleRight.setText("O");
+				}
+				if (x==2 && y==0) {
+					bottomLeft.setText("O");
+				}
+				if (x==2 && y==1) {
+					bottomMiddle.setText("O");
+				}
+				if (x==2 && y==2) {
+					bottomRight.setText("O");
+				}
+				keepGoing++;
+				turn++;
+			}
+		}
+	}
+
+	public void reset() {
+		turn = 1;
+		pturn.setText("Current Turn: Player 1");
+		winner = 0;
+		topLeft.setText("-");
+		topMiddle.setText("-");
+		topRight.setText("-");
+		middleLeft.setText("-");
+		middleMiddle.setText("-");
+		middleRight.setText("-");
+		bottomLeft.setText("-");
+		bottomMiddle.setText("-");
+		bottomRight.setText("-");
+		for (int i=0;i<3;i++)
+			for (int k=0;k<3;k++)
+				gamePlay[i][k]='-';
+	}
+
+
+	public static void main (String[] args) {
+		new TicTacToeVsComp();
+	}
+}
